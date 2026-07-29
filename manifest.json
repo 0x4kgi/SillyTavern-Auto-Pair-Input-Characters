@@ -1,0 +1,8 @@
+{
+    "display_name": "Auto Pair Input Characters",
+    "loading_order": 1,
+    "js": "index.js",
+    "author": "0x4kgi",
+    "version": "0.0.1",
+    "homePage": "https://github.com/0x4kgi/SillyTavern-Auto-Pair-Input-Characters"
+}
