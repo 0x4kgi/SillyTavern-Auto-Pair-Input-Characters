@@ -113,7 +113,7 @@ function onClosingTyped(inputField, key) {
         inputField.setRangeText(pair.close, cursorLeft, cursorRight, "end");
     }
 
-    inputField.setSelectionRange(cursorLeft + 1, cursorRight + 1);
+    inputField.setSelectionRange(cursorLeft + 1, cursorLeft + 1);
 }
 
 /**
