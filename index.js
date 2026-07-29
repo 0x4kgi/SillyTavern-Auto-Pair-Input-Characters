@@ -9,9 +9,9 @@ const PAIRS = {
     "{": "}",
     "<": ">",
 };
-const OPEN_CHARS = Object.keys(PAIRS);
-const CLOSE_CHARS = Object.values(PAIRS);
-const VALID_CHARS = [...OPEN_CHARS, ...CLOSE_CHARS];
+const OPEN_CHARS = new Set(Object.keys(PAIRS));
+const CLOSE_CHARS = new Set(Object.values(PAIRS));
+const VALID_CHARS = new Set([...OPEN_CHARS, ...CLOSE_CHARS]);
 const VALID_INPUT_TYPE = [
     "insertText",
     "deleteContentForward",
@@ -41,10 +41,10 @@ function onInput(event) {
         return;
     }
 
-    if (!VALID_CHARS.includes(key)) return;
+    if (!VALID_CHARS.has(key)) return;
 
-    let keyIsOpen = OPEN_CHARS.includes(key);
-    let keyIsClose = CLOSE_CHARS.includes(key);
+    let keyIsOpen = OPEN_CHARS.has(key);
+    let keyIsClose = CLOSE_CHARS.has(key);
 
     // ( { [ <
     if (keyIsOpen && !keyIsClose) {
