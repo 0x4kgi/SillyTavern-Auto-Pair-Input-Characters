@@ -9,9 +9,14 @@ const PAIRS = {
     "{": "}",
     "<": ">",
 };
+const INVERSE_PAIRS = Object.fromEntries(
+    Object.entries(PAIRS).map(([key, value]) => [value, key])
+);
+
 const OPEN_CHARS = new Set(Object.keys(PAIRS));
-const CLOSE_CHARS = new Set(Object.values(PAIRS));
+const CLOSE_CHARS = new Set(Object.keys(INVERSE_PAIRS));
 const VALID_CHARS = new Set([...OPEN_CHARS, ...CLOSE_CHARS]);
+
 const VALID_INPUT_TYPE = [
     "insertText",
     "deleteContentForward",
@@ -97,10 +102,9 @@ function addClosing(inputField, key) {
  * @returns {void}
  */
 function onClosingTyped(inputField, key) {
-    const openChar = Object.keys(PAIRS).find(char => PAIRS[char] === key);
     const pair = {
-        open: openChar,
-        close: PAIRS[openChar],
+        open: INVERSE_PAIRS[key],
+        close: key,
     };
 
     const cursorLeft = inputField.selectionStart;
