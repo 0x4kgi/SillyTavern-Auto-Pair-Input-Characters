@@ -174,4 +174,9 @@ function deletePair(event, inputType) {
     log("Deleting pair....");
 }
 
-document.addEventListener('beforeinput', onInput);
+function main() {
+    document.addEventListener('beforeinput', onInput);
+    log("Extension loaded.");
+}
+
+main();
