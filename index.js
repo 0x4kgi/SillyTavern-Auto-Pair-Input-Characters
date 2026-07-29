@@ -110,13 +110,10 @@ function onClosingTyped(inputField, key) {
     const nextCharacter = value.charAt(cursorRight);
 
     if (nextCharacter !== pair.close) {
-        inputField.value = value.substring(0, cursorLeft)
-            + pair.close
-            + value.substring(cursorRight);
+        inputField.setRangeText(pair.close, cursorLeft, cursorRight, "end");
     }
 
-    inputField.selectionStart = cursorLeft + 1;
-    inputField.selectionEnd = inputField.selectionStart;
+    inputField.setSelectionRange(cursorLeft + 1, cursorRight + 1);
 }
 
 /**
@@ -150,9 +147,8 @@ function identicalPair(inputField, key) {
     // o cursor x
     if (isLeftMatch && !isRightMatch) {
         // just add it
-        inputField.value = value.substring(0, cursorLeft)
-            + key
-            + value.substring(cursorRight);
+        inputField.setRangeText(key, cursorLeft, cursorRight, "end");
+        inputField.setSelectionRange(cursorLeft + 1, cursorRight + 1);
         return;
     }
 }
