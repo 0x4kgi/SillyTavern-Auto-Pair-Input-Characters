@@ -132,14 +132,24 @@ function identicalPair(inputField, key) {
     const isLeftMatch = key === leftChar;
     const isRightMatch = key === rightChar;
 
-    // x cursor x OR o cursor o
-    if ((!isLeftMatch && !isRightMatch) || (isLeftMatch && isRightMatch)) {
+    // o cursor o AND has selected text
+    // wrap them, regardless if the pairs are already beside the cursor
+    // VS code behavior with "double quotes"
+    // a bit odd for **bold** (or ***italic bold***) and ```code block``` syntaxes...
+    if ((cursorLeft !== cursorRight) && (isLeftMatch && isRightMatch)) {
         addClosing(inputField, key);
         return;
     }
 
-    // x cursor o
-    if (!isLeftMatch && isRightMatch) {
+    // x cursor x
+    // separated chunk, to not have a long if statement line
+    if ((!isLeftMatch && !isRightMatch) ) {
+        addClosing(inputField, key);
+        return;
+    }
+
+    // x cursor o OR o cursor o
+    if ((!isLeftMatch && isRightMatch) || (isLeftMatch && isRightMatch)) {
         onClosingTyped(inputField, key);
         return;
     }
