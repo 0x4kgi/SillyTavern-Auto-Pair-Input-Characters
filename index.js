@@ -146,7 +146,7 @@ function identicalPair(inputField, key) {
 
     // x cursor x
     // separated chunk, to not have a long if statement line
-    if ((!isLeftMatch && !isRightMatch)) {
+    if (!isLeftMatch && !isRightMatch) {
         addClosing(inputField, key);
         return;
     }
@@ -168,7 +168,6 @@ function identicalPair(inputField, key) {
 
 /**
  * @param {InputEvent} event
- * @param {string} inputType
  */
 function deletePair(event) {
     /** @type {HTMLInputElement} */
