@@ -41,7 +41,7 @@ function onInput(event) {
     if (!VALID_INPUT_TYPE.includes(inputType)) return;
 
     if (inputType.includes("delete")) {
-        deletePair(event, inputType);
+        deletePair(event);
         return;
     }
 
@@ -170,7 +170,7 @@ function identicalPair(inputField, key) {
  * @param {InputEvent} event
  * @param {string} inputType
  */
-function deletePair(event, inputType) {
+function deletePair(event) {
     /** @type {HTMLInputElement} */
     const inputField = event.target;
 
@@ -181,8 +181,10 @@ function deletePair(event, inputType) {
     const leftChar = value.charAt(cursorLeft - 1) || "";
     const rightChar = value.charAt(cursorRight) || "";
 
+    if (cursorLeft !== cursorRight) return;
     if (!OPEN_CHARS.has(leftChar)) return;
     if (!CLOSE_CHARS.has(rightChar)) return;
+    if (PAIRS[leftChar] !== rightChar) return;
 
     event.preventDefault();
     inputField.setRangeText("", cursorLeft - 1, cursorRight + 1, "end");
