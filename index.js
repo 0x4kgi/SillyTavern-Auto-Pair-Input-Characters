@@ -183,7 +183,6 @@ function deletePair(event) {
 
     if (cursorLeft !== cursorRight) return;
     if (!OPEN_CHARS.has(leftChar)) return;
-    if (!CLOSE_CHARS.has(rightChar)) return;
     if (PAIRS[leftChar] !== rightChar) return;
 
     event.preventDefault();
