@@ -19,7 +19,6 @@ const VALID_CHARS = new Set([...OPEN_CHARS, ...CLOSE_CHARS]);
 
 const VALID_INPUT_TYPE = [
     "insertText",
-    "deleteContentForward",
     "deleteContentBackward",
 ];
 
@@ -147,7 +146,7 @@ function identicalPair(inputField, key) {
 
     // x cursor x
     // separated chunk, to not have a long if statement line
-    if ((!isLeftMatch && !isRightMatch) ) {
+    if ((!isLeftMatch && !isRightMatch)) {
         addClosing(inputField, key);
         return;
     }
@@ -172,8 +171,6 @@ function identicalPair(inputField, key) {
  * @param {string} inputType
  */
 function deletePair(event, inputType) {
-    return; //temp, idk what to do yet lol
-
     /** @type {HTMLInputElement} */
     const inputField = event.target;
 
@@ -181,11 +178,14 @@ function deletePair(event, inputType) {
     const cursorRight = inputField.selectionEnd;
     const value = inputField.value;
 
-    const stringLeft = value.substring()
+    const leftChar = value.charAt(cursorLeft - 1) || "";
+    const rightChar = value.charAt(cursorRight) || "";
 
-    if (!OPEN_CHARS.includes(stringRight[0])) return;
+    if (!OPEN_CHARS.has(leftChar)) return;
+    if (!CLOSE_CHARS.has(rightChar)) return;
 
-    log("Deleting pair....");
+    event.preventDefault();
+    inputField.setRangeText("", cursorLeft - 1, cursorRight + 1, "end");
 }
 
 function main() {
