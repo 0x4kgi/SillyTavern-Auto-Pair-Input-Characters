@@ -185,10 +185,11 @@ function deletePair(event) {
     const cursorRight = inputField.selectionEnd;
     const value = inputField.value;
 
-    // Mobile has no need for an offset of -1, for some reason?
-    const leftChar = !isMobile
-        ? value.charAt(cursorLeft - 1) || ""
-        : value.charAt(cursorLeft) || "";
+    // Deletion works differently in mobile...
+    // selects THEN delete. Hence the offset (or lack thereof) here.
+    const cursorOffset = isMobile ? 0 : 1;
+
+    const leftChar = value.charAt(cursorLeft - cursorOffset) || "";
     const rightChar = value.charAt(cursorRight) || "";
 
     // The following two are additional checks added for isMobile
@@ -200,11 +201,7 @@ function deletePair(event) {
 
     event.preventDefault();
 
-    // Same logic as leftChar, no need for -1 offset on mobile.
-    const deleteLeftPos = !isMobile
-        ? cursorLeft - 1
-        : cursorLeft;
-    inputField.setRangeText("", deleteLeftPos, cursorRight + 1, "end");
+    inputField.setRangeText("", cursorLeft - cursorOffset, cursorRight + 1, "end");
 }
 
 function main() {
