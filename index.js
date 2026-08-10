@@ -1,5 +1,11 @@
 const EXTENSION_NAME = "SillyTavern-Auto-Pair-Input-Characters";
 
+// Its here since on mobile the selectionStart and End is different
+// see deletePair::leftChar
+// also initialized globally, to not refetch it
+// just refresh the page if somehow the platform changes
+const isMobile = SillyTavern.getContext().isMobile();
+
 const PAIRS = {
     '"': '"',
     "*": "*",
@@ -39,6 +45,8 @@ function onInput(event) {
     const key = event.data;
 
     if (!VALID_INPUT_TYPE.includes(inputType)) return;
+
+    if (event.isComposing) return;
 
     if (inputType.includes("delete")) {
         deletePair(event);
@@ -177,15 +185,23 @@ function deletePair(event) {
     const cursorRight = inputField.selectionEnd;
     const value = inputField.value;
 
-    const leftChar = value.charAt(cursorLeft - 1) || "";
+    // Deletion works differently in mobile...
+    // selects THEN delete. Hence the offset (or lack thereof) here.
+    const cursorOffset = isMobile ? 0 : 1;
+
+    const leftChar = value.charAt(cursorLeft - cursorOffset) || "";
     const rightChar = value.charAt(cursorRight) || "";
 
-    if (cursorLeft !== cursorRight) return;
+    // The following two are additional checks added for isMobile
+    if (isMobile && ((cursorRight - cursorLeft) !== 1)) return;
+    if (!isMobile && (cursorLeft !== cursorRight)) return;
+
     if (!OPEN_CHARS.has(leftChar)) return;
     if (PAIRS[leftChar] !== rightChar) return;
 
     event.preventDefault();
-    inputField.setRangeText("", cursorLeft - 1, cursorRight + 1, "end");
+
+    inputField.setRangeText("", cursorLeft - cursorOffset, cursorRight + 1, "end");
 }
 
 function main() {
