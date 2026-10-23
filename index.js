@@ -158,12 +158,15 @@ function identicalPair(inputField, key) {
 
     // x cursor x BUT the leftChar is /\w/
     // takes precedence over everything, and only applicable to the single quote
-    if (key === "'" && REGEX_WORD.test(leftChar) & !isRightMatch) {
-        // don't, won't, doesn't, etc...
-        // /\w/ cursor key, don't apply pairs, just add it
-        inputField.setRangeText(key, cursorLeft, cursorRight, "end");
-        inputField.setSelectionRange(cursorLeft + 1, cursorRight + 1);
-        return;
+    // and not selecting a range!!
+    if (key === "'" && (cursorLeft == cursorRight) && !isRightMatch) {
+        if (REGEX_WORD.test(leftChar)) {
+            // don't, won't, doesn't, etc...
+            // /\w/ cursor key, don't apply pairs, just add it
+            inputField.setRangeText(key, cursorLeft, cursorRight, "end");
+            inputField.setSelectionRange(cursorLeft + 1, cursorRight + 1);
+            return;
+        }
     }
 
     // x cursor x
