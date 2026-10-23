@@ -8,6 +8,7 @@ const isMobile = SillyTavern.getContext().isMobile();
 
 const PAIRS = {
     '"': '"',
+    "'": "'",
     "*": "*",
     "`": "`",
     "(": ")",
@@ -18,6 +19,9 @@ const PAIRS = {
 const INVERSE_PAIRS = Object.fromEntries(
     Object.entries(PAIRS).map(([key, value]) => [value, key])
 );
+
+// cache regexes here
+const REGEX_WORD = /\w/;
 
 const OPEN_CHARS = new Set(Object.keys(PAIRS));
 const CLOSE_CHARS = new Set(Object.keys(INVERSE_PAIRS));
@@ -150,6 +154,19 @@ function identicalPair(inputField, key) {
     if ((cursorLeft !== cursorRight) && (isLeftMatch && isRightMatch)) {
         addClosing(inputField, key);
         return;
+    }
+
+    // x cursor x BUT the leftChar is /\w/
+    // takes precedence over everything, and only applicable to the single quote
+    // and not selecting a range!!
+    if (key === "'" && (cursorLeft == cursorRight) && !isRightMatch) {
+        if (REGEX_WORD.test(leftChar)) {
+            // don't, won't, doesn't, etc...
+            // /\w/ cursor key, don't apply pairs, just add it
+            inputField.setRangeText(key, cursorLeft, cursorRight, "end");
+            inputField.setSelectionRange(cursorLeft + 1, cursorRight + 1);
+            return;
+        }
     }
 
     // x cursor x
