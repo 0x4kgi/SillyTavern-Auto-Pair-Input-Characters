@@ -173,19 +173,21 @@ function identicalPair(inputField, key) {
     const isLeftMatch = key === leftChar;
     const isRightMatch = key === rightChar;
 
-    // o cursor o AND has selected text
-    // wrap them, regardless if the pairs are already beside the cursor
-    // VS code behavior with "double quotes"
-    // a bit odd for **bold** (or ***italic bold***) and ```code block``` syntaxes...
-    if ((cursorLeft !== cursorRight) && (isLeftMatch && isRightMatch)) {
+    // if selecting text wrap them unconditionally
+    // code will never reach here if the keys are not on VALID_CHARS
+    // in the first place
+    // matches VSCode "quoting" with selection
+    if (cursorLeft !== cursorRight) {
         addClosing(inputField, key);
         return;
     }
 
+    // as all of the selection logic is caught above, everything else is assumed
+    // non selection pairing. maybe.
+
     // x cursor x BUT the leftChar is /\w/
-    // takes precedence over everything, and only applicable to the single quote
-    // and not selecting a range!!
-    if (key === "'" && (cursorLeft == cursorRight) && !isRightMatch) {
+    // takes priority, and only applicable to the single quote
+    if (key === "'" && !isRightMatch) {
         if (REGEX_WORD.test(leftChar)) {
             // don't, won't, doesn't, etc...
             // /\w/ cursor key, don't apply pairs, just add it
@@ -196,7 +198,6 @@ function identicalPair(inputField, key) {
     }
 
     // x cursor x
-    // separated chunk, to not have a long if statement line
     if (!isLeftMatch && !isRightMatch) {
         addClosing(inputField, key);
         return;
