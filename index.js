@@ -59,6 +59,12 @@ function onInput(event) {
 
     if (!VALID_CHARS.has(key)) return;
 
+    // Escape character check, \( and \\() cases
+    // could be more elegant?
+    if (countCharFromCursor("\\", inputField) % 2 !== 0) {
+        return;
+    }
+
     let keyIsOpen = OPEN_CHARS.has(key);
     let keyIsClose = CLOSE_CHARS.has(key);
 
@@ -82,6 +88,26 @@ function onInput(event) {
         identicalPair(inputField, key);
         return;
     }
+}
+
+/**
+ * @param {string} toFind
+ * @param {HTMLInputElement} inputField
+ * @param {boolean} checkLeft defaults true
+ * @returns {void}
+ */
+function countCharFromCursor(toFind, inputField, checkLeft = true) {
+    const value = inputField.value;
+    const startIndex = checkLeft
+        ? inputField.selectionStart - 1
+        : inputField.selectionEnd;
+    const valueNudge = checkLeft ? -1 : 1;
+
+    let count = 0;
+    for (let i = startIndex; value[i] === toFind; i += valueNudge) {
+        count += 1;
+    }
+    return count;
 }
 
 /**
