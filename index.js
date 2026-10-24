@@ -210,8 +210,14 @@ function identicalPair(inputField, key) {
 
     // o cursor x
     if (isLeftMatch && !isRightMatch) {
-        // just add it
+        // add it first
         inputField.setRangeText(key, cursorLeft, cursorRight, "end");
+
+        // then, if ``` create a code fence!
+        if (countCharFromCursor("`", inputField) === 3) {
+            inputField.setRangeText("\n```", cursorLeft + 1, cursorRight + 1, "end");
+        }
+
         inputField.setSelectionRange(cursorLeft + 1, cursorRight + 1);
         return;
     }
