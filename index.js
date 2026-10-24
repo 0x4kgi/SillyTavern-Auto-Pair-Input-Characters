@@ -21,7 +21,7 @@ const INVERSE_PAIRS = Object.fromEntries(
 );
 
 // cache regexes here
-const REGEX_WORD = /\w/;
+const REGEX_COMMON = /[\w,.?!]/;
 
 const OPEN_CHARS = new Set(Object.keys(PAIRS));
 const CLOSE_CHARS = new Set(Object.keys(INVERSE_PAIRS));
@@ -185,12 +185,11 @@ function identicalPair(inputField, key) {
     // as all of the selection logic is caught above, everything else is assumed
     // non selection pairing. maybe.
 
-    // o/x cursor x BUT the leftChar is /\w/
-    // takes priority, and only applicable to the single quote
-    if (key === "'" && !isRightMatch) {
-        if (REGEX_WORD.test(leftChar)) {
-            // don't, won't, doesn't, etc...
-            // /\w/ cursor key, don't apply pairs, just add it
+    // o/x cursor x BUT the surrounding chars is/are REGEX_COMMON
+    // (letters, nums, common punctuations)
+    if (!isRightMatch) {
+        // basically requires a space or REGEX_COMMON to pair now
+        if (REGEX_COMMON.test(leftChar) || REGEX_COMMON.test(rightChar)) {
             inputField.setRangeText(key, cursorLeft, cursorRight, "end");
             inputField.setSelectionRange(cursorLeft + 1, cursorRight + 1);
             return;
