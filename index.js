@@ -185,7 +185,7 @@ function identicalPair(inputField, key) {
     // as all of the selection logic is caught above, everything else is assumed
     // non selection pairing. maybe.
 
-    // x cursor x BUT the leftChar is /\w/
+    // o/x cursor x BUT the leftChar is /\w/
     // takes priority, and only applicable to the single quote
     if (key === "'" && !isRightMatch) {
         if (REGEX_WORD.test(leftChar)) {
@@ -203,8 +203,8 @@ function identicalPair(inputField, key) {
         return;
     }
 
-    // x cursor o OR o cursor o
-    if ((!isLeftMatch && isRightMatch) || (isLeftMatch && isRightMatch)) {
+    // o/x cursor o
+    if (isRightMatch) {
         onClosingTyped(inputField, key);
         return;
     }
