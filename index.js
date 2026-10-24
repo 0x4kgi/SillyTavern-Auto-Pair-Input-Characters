@@ -188,7 +188,7 @@ function identicalPair(inputField, key) {
     // o/x cursor x BUT the surrounding chars is/are REGEX_COMMON
     // (letters, nums, common punctuations)
     if (!isRightMatch) {
-        // basically requires a space or REGEX_COMMON to pair now
+        // basically requires a space or non REGEX_COMMON to pair now
         if (REGEX_COMMON.test(leftChar) || REGEX_COMMON.test(rightChar)) {
             inputField.setRangeText(key, cursorLeft, cursorRight, "end");
             inputField.setSelectionRange(cursorLeft + 1, cursorRight + 1);
