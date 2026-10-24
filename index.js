@@ -20,8 +20,19 @@ const INVERSE_PAIRS = Object.fromEntries(
     Object.entries(PAIRS).map(([key, value]) => [value, key])
 );
 
-// cache regexes here
-const REGEX_COMMON = /[\w,.?!]/;
+/**
+ * The usual prose endings are included, examples (look at what the quotes wrap):
+ * - "Word," phrase. "Exclamation!"
+ * - Noun verb, "Word."
+ * - Adjective noun, "Word?"
+ *
+ * These never happen (to me, at least):
+ * - "Word:" adverb noun.
+ *
+ * `;:-` is not a sentence ending characters to me, personally.
+ */
+const REGEX_NO_PAIR_LEFT = /[\w,.?!]/;
+const REGEX_NO_PAIR_RIGHT = /\w/;
 
 const OPEN_CHARS = new Set(Object.keys(PAIRS));
 const CLOSE_CHARS = new Set(Object.keys(INVERSE_PAIRS));
@@ -185,11 +196,15 @@ function identicalPair(inputField, key) {
     // as all of the selection logic is caught above, everything else is assumed
     // non selection pairing. maybe.
 
-    // o/x cursor x BUT the surrounding chars is/are REGEX_COMMON
-    // (letters, nums, common punctuations)
+    // o/x cursor x BUT some checking on char besides the cursor
     if (!isRightMatch) {
-        // basically requires a space or non REGEX_COMMON to pair now
-        if (REGEX_COMMON.test(leftChar) || REGEX_COMMON.test(rightChar)) {
+        // basically requires a space or non REGEX_NO_PAIR_* to pair now
+        // left check: sentence ends + \w
+        // right check: only \w
+        // so I can fix these cases: |word" "Word?|
+        // but not word <space> |. and its derivatives. personal preference
+        // TODO: make this configurable, actually: the entire extension.
+        if (REGEX_NO_PAIR_LEFT.test(leftChar) || REGEX_NO_PAIR_RIGHT.test(rightChar)) {
             inputField.setRangeText(key, cursorLeft, cursorRight, "end");
             inputField.setSelectionRange(cursorLeft + 1, cursorRight + 1);
             return;
