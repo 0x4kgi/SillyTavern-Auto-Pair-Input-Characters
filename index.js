@@ -219,6 +219,11 @@ function identicalPair(inputField, key) {
             inputField.setRangeText("\n```", cursorLeft + 1, cursorLeft + 1, "end");
         }
 
+        // or if *** (bold italic), wrap!
+        else if (key === "*" && countCharFromCursor("*", inputField) === 3) {
+            inputField.setRangeText("***", cursorLeft + 1, cursorLeft + 1, "end");
+        }
+
         inputField.setSelectionRange(cursorLeft + 1, cursorRight + 1);
         return;
     }
