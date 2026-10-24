@@ -20,8 +20,19 @@ const INVERSE_PAIRS = Object.fromEntries(
     Object.entries(PAIRS).map(([key, value]) => [value, key])
 );
 
-// cache regexes here
-const REGEX_WORD = /\w/;
+/**
+ * The usual prose endings are included, examples (look at what the quotes wrap):
+ * - "Word," phrase. "Exclamation!"
+ * - Noun verb, "Word."
+ * - Adjective noun, "Word?"
+ *
+ * These never happen (to me, at least):
+ * - "Word:" adverb noun.
+ *
+ * `;:-` is not a sentence ending characters to me, personally.
+ */
+const REGEX_NO_PAIR_LEFT = /[\w,.?!]/;
+const REGEX_NO_PAIR_RIGHT = /\w/;
 
 const OPEN_CHARS = new Set(Object.keys(PAIRS));
 const CLOSE_CHARS = new Set(Object.keys(INVERSE_PAIRS));
@@ -59,6 +70,12 @@ function onInput(event) {
 
     if (!VALID_CHARS.has(key)) return;
 
+    // Escape character check, \( and \\() cases
+    // could be more elegant?
+    if (countCharFromCursor("\\", inputField) % 2 !== 0) {
+        return;
+    }
+
     let keyIsOpen = OPEN_CHARS.has(key);
     let keyIsClose = CLOSE_CHARS.has(key);
 
@@ -82,6 +99,26 @@ function onInput(event) {
         identicalPair(inputField, key);
         return;
     }
+}
+
+/**
+ * @param {string} toFind
+ * @param {HTMLInputElement} inputField
+ * @param {boolean} checkLeft defaults true
+ * @returns {void}
+ */
+function countCharFromCursor(toFind, inputField, checkLeft = true) {
+    const value = inputField.value;
+    const startIndex = checkLeft
+        ? inputField.selectionStart - 1
+        : inputField.selectionEnd;
+    const valueNudge = checkLeft ? -1 : 1;
+
+    let count = 0;
+    for (let i = startIndex; value[i] === toFind; i += valueNudge) {
+        count += 1;
+    }
+    return count;
 }
 
 /**
@@ -147,22 +184,27 @@ function identicalPair(inputField, key) {
     const isLeftMatch = key === leftChar;
     const isRightMatch = key === rightChar;
 
-    // o cursor o AND has selected text
-    // wrap them, regardless if the pairs are already beside the cursor
-    // VS code behavior with "double quotes"
-    // a bit odd for **bold** (or ***italic bold***) and ```code block``` syntaxes...
-    if ((cursorLeft !== cursorRight) && (isLeftMatch && isRightMatch)) {
+    // if selecting text wrap them unconditionally
+    // code will never reach here if the keys are not on VALID_CHARS
+    // in the first place
+    // matches VSCode "quoting" with selection
+    if (cursorLeft !== cursorRight) {
         addClosing(inputField, key);
         return;
     }
 
-    // x cursor x BUT the leftChar is /\w/
-    // takes precedence over everything, and only applicable to the single quote
-    // and not selecting a range!!
-    if (key === "'" && (cursorLeft == cursorRight) && !isRightMatch) {
-        if (REGEX_WORD.test(leftChar)) {
-            // don't, won't, doesn't, etc...
-            // /\w/ cursor key, don't apply pairs, just add it
+    // as all of the selection logic is caught above, everything else is assumed
+    // non selection pairing. maybe.
+
+    // o/x cursor x BUT some checking on char besides the cursor
+    if (!isRightMatch) {
+        // basically requires a space or non REGEX_NO_PAIR_* to pair now
+        // left check: sentence ends + \w
+        // right check: only \w
+        // so I can fix these cases: |word" "Word?|
+        // but not word <space> |. and its derivatives. personal preference
+        // TODO: make this configurable, actually: the entire extension.
+        if (REGEX_NO_PAIR_LEFT.test(leftChar) || REGEX_NO_PAIR_RIGHT.test(rightChar)) {
             inputField.setRangeText(key, cursorLeft, cursorRight, "end");
             inputField.setSelectionRange(cursorLeft + 1, cursorRight + 1);
             return;
@@ -170,22 +212,32 @@ function identicalPair(inputField, key) {
     }
 
     // x cursor x
-    // separated chunk, to not have a long if statement line
     if (!isLeftMatch && !isRightMatch) {
         addClosing(inputField, key);
         return;
     }
 
-    // x cursor o OR o cursor o
-    if ((!isLeftMatch && isRightMatch) || (isLeftMatch && isRightMatch)) {
+    // o/x cursor o
+    if (isRightMatch) {
         onClosingTyped(inputField, key);
         return;
     }
 
     // o cursor x
     if (isLeftMatch && !isRightMatch) {
-        // just add it
+        // add it first
         inputField.setRangeText(key, cursorLeft, cursorRight, "end");
+
+        // then, if ``` create a code fence!
+        if (key === "`" && countCharFromCursor("`", inputField) === 3) {
+            inputField.setRangeText("\n```", cursorLeft + 1, cursorLeft + 1, "end");
+        }
+
+        // or if *** (bold italic), wrap!
+        else if (key === "*" && countCharFromCursor("*", inputField) === 3) {
+            inputField.setRangeText("***", cursorLeft + 1, cursorLeft + 1, "end");
+        }
+
         inputField.setSelectionRange(cursorLeft + 1, cursorRight + 1);
         return;
     }
