@@ -34,10 +34,10 @@ Just type anywhere, you'll see it work.
 ## Todo
 - [x] `'` ~~adding single quote support~~ (DONE: [0.1.2](https://github.com/0x4kgi/SillyTavern-Auto-Pair-Input-Characters/commit/06ca6dfa525fe35846035ad70a1263967aaaa598))
   - if the single quote is used on contractions (don't, won't, doesn't, etc.) it will not add the closing single quote
-- [ ] `\` escape detection
+- [x] ~~`\` escape detection~~ (DONE: 0.2.0)
   - typing `\[`, `\"` or any valid symbols will block it from adding its closing pair
   - `\\""` escaped backslash should be ignored
-- [ ] <code>```</code> code fences detection
+- [x] ~~<code>```</code> code fences detection~~ (DONE: [0.2.0](https://github.com/0x4kgi/SillyTavern-Auto-Pair-Input-Characters/commit/41befda3d0d194ad3b28c4feaf98201e3ebe56ce))
 - [ ] probably a settings panel
 - [ ] *will add more todos if i feel like it*
 
